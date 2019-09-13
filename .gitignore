@@ -4,4 +4,3 @@ elm-stuff
 repl-temp-*
 
 dist/elm.js
-node_modules
