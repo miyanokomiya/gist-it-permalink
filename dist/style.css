@@ -4,7 +4,8 @@ html {
 #app {
   width: 100%;
 }
-input, textarea {
+input,
+textarea {
   width: 100%;
   padding: 0.5rem;
   border: 1px solid gray;
@@ -15,11 +16,22 @@ textarea {
   background-color: #eee;
 }
 .button-block {
-  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: end;
 }
 button {
   width: 6rem;
   padding: 0.2rem;
+}
+.footer-select-block {
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+}
+.footer-select-block span {
+  margin-right: 0.5rem;
+  font-size: 0.8rem;
 }
 .link-block {
   text-align: right;

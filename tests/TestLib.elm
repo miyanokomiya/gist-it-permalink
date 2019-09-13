@@ -17,8 +17,11 @@ suite =
                             , "https://example.com#L12"
                             , "https://example.com"
                             ]
+
+                        footerType =
+                            Lib.Default
                     in
-                    List.map Lib.convertGitItScript msgs
+                    List.map (\m -> Lib.convertGitItScript m footerType) msgs
                         |> Expect.equal
                             (List.map
                                 (\s -> Lib.gitItScriptPre ++ s ++ Lib.gitItScriptSuf)
@@ -37,8 +40,11 @@ suite =
                             , Lib.Permalink "https://example.com" (Lib.LineRange 12 12)
                             , Lib.Permalink "https://example.com" (Lib.LineRange 0 0)
                             ]
+
+                        footerType =
+                            Lib.Default
                     in
-                    List.map Lib.convertGitItFile msgs
+                    List.map (\m -> Lib.convertGitItFile m footerType) msgs
                         |> Expect.equal
                             [ "url?slice=11:34"
                             , "https://example.com?slice=11"

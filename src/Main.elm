@@ -1,20 +1,23 @@
 port module Main exposing (main)
 
 import Browser
-import Html
-import Html.Attributes
-import Html.Events
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
+import Json.Decode as Json
 import Lib
 
 
 type alias Model =
     { permalink : String
+    , footerType : Lib.FooterType
     }
 
 
 init : Int -> ( Model, Cmd Msg )
 init _ =
     ( { permalink = ""
+      , footerType = Lib.Default
       }
     , Cmd.none
     )
@@ -26,6 +29,7 @@ init _ =
 
 type Msg
     = InputPermalink String
+    | ChangeFooterType String
     | Copy
 
 
@@ -37,6 +41,9 @@ update msg model =
     case msg of
         InputPermalink text ->
             ( { model | permalink = text }, Cmd.none )
+
+        ChangeFooterType text ->
+            ( { model | footerType = Lib.footerTypeFromString text }, Cmd.none )
 
         Copy ->
             ( model, copy () )
@@ -55,24 +62,58 @@ subscriptions model =
 -- VIEW
 
 
-view : Model -> Html.Html Msg
+srcInput : Model -> Html Msg
+srcInput model =
+    input [ type_ "text", placeholder "Input Permalink", value model.permalink, onInput InputPermalink ] []
+
+
+onChange : (String -> msg) -> Attribute msg
+onChange handler =
+    on "change" (Json.map handler targetValue)
+
+
+distTextarea : String -> Html Msg
+distTextarea dist =
+    textarea [ id "result", readonly True ] [ text dist ]
+
+
+footerTypes : List Lib.FooterType
+footerTypes =
+    [ Lib.Default, Lib.Minimal, Lib.No ]
+
+
+footerOption : Lib.FooterType -> Html Msg
+footerOption ft =
+    let
+        val =
+            Lib.footerTypeToString ft
+    in
+    option [ value val ] [ text val ]
+
+
+footerSelect : Model -> Html Msg
+footerSelect model =
+    select [ value (Lib.footerTypeToString model.footerType), onChange ChangeFooterType ]
+        (List.map footerOption footerTypes)
+
+
+view : Model -> Html Msg
 view model =
     let
         script =
-            Lib.convertGitItScript model.permalink
+            Lib.convertGitItScript model.permalink model.footerType
     in
-    Html.div [ Html.Attributes.id "app" ]
-        [ viewInput "text" "Input Permalink" model.permalink InputPermalink
-        , Html.textarea [ Html.Attributes.id "result", Html.Attributes.readonly True ] [ Html.text script ]
-        , Html.div [ Html.Attributes.class "button-block" ]
-            [ Html.button [ Html.Events.onClick Copy ] [ Html.text "copy" ]
+    div [ id "app" ]
+        [ srcInput model
+        , distTextarea script
+        , div [ class "button-block" ]
+            [ div [ class "footer-select-block" ]
+                [ span [] [ text "Footer: " ]
+                , footerSelect model
+                ]
+            , button [ onClick Copy ] [ text "copy" ]
             ]
         ]
-
-
-viewInput : String -> String -> String -> (String -> msg) -> Html.Html msg
-viewInput t p v toMsg =
-    Html.input [ Html.Attributes.type_ t, Html.Attributes.placeholder p, Html.Attributes.value v, Html.Events.onInput toMsg ] []
 
 
 

@@ -13,28 +13,89 @@ type alias LineRange =
     }
 
 
-convertGitItScript : String -> String
-convertGitItScript msg =
-    parsePermalink msg
-        |> convertGitItFile
+type FooterType
+    = Default
+    | Minimal
+    | No
+
+
+footerTypeToString : FooterType -> String
+footerTypeToString ft =
+    case ft of
+        Default ->
+            "Default"
+
+        Minimal ->
+            "Minimal"
+
+        No ->
+            "No"
+
+
+footerTypeFromString : String -> FooterType
+footerTypeFromString str =
+    if str == footerTypeToString Default then
+        Default
+
+    else if str == footerTypeToString Minimal then
+        Minimal
+
+    else
+        No
+
+
+convertGitItScript : String -> FooterType -> String
+convertGitItScript msg ft =
+    convertGitItFile (parsePermalink msg) ft
         |> genScript
 
 
-convertGitItFile : Permalink -> String
-convertGitItFile msg =
-    if msg.lineRange.from == 0 then
-        msg.url
+toFooterQuery : FooterType -> String
+toFooterQuery footerType =
+    case footerType of
+        Default ->
+            ""
+
+        Minimal ->
+            "footer=minimal"
+
+        No ->
+            "footer=no"
+
+
+toLineRangeQuery : LineRange -> String
+toLineRangeQuery lineRange =
+    if lineRange.from == 0 then
+        ""
 
     else
-        msg.url
-            ++ "?slice="
-            ++ String.fromInt (msg.lineRange.from - 1)
-            ++ (if msg.lineRange.from == msg.lineRange.to then
+        "slice="
+            ++ String.fromInt (lineRange.from - 1)
+            ++ (if lineRange.from == lineRange.to then
                     ""
 
                 else
-                    ":" ++ String.fromInt msg.lineRange.to
+                    ":" ++ String.fromInt lineRange.to
                )
+
+
+convertGitItFile : Permalink -> FooterType -> String
+convertGitItFile msg ft =
+    let
+        footerTypeQuery =
+            toFooterQuery ft
+
+        lineRangeQuery =
+            toLineRangeQuery msg.lineRange
+
+        queryList =
+            List.filter (\s -> String.length s > 0) [ lineRangeQuery, footerTypeQuery ]
+    in
+    if List.length queryList == 0 then
+        msg.url
+
+    else
+        msg.url ++ "?" ++ String.join "&" queryList
 
 
 gitItScriptPre : String
