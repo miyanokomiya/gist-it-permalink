@@ -3,7 +3,9 @@
 
 # gist-it-permalink
 
-Convert permalint to gist-it script.
+Convert github permalint to gist-it script.
+
+https://naughty-albattani-e8027f.netlify.com/
 
 ## dev
 
