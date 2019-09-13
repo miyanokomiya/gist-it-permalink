@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" type="text/css" href="./style.css">
+    <script src="elm.js"></script>
+    <title>gist-it-permalink</title>
+  </head>
+  <body>
+    <div id="elm-node" />
+      <script>
+        Elm.Main.init({
+          node: document.getElementById("elm-node"),
+          flags: Date.now()
+        });
+      </script>
+  </body>
+</html>
