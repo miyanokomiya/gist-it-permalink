@@ -8,7 +8,44 @@ import Test exposing (..)
 suite : Test
 suite =
     describe "Lib"
-        [ describe "parsePermalink"
+        [ describe "convertGitItScript"
+            [ test "convert permalink to git-it script" <|
+                \_ ->
+                    let
+                        msgs =
+                            [ "url#L12-L34"
+                            , "https://example.com#L12"
+                            , "https://example.com"
+                            ]
+                    in
+                    List.map Lib.convertGitItScript msgs
+                        |> Expect.equal
+                            (List.map
+                                (\s -> Lib.gitItScriptPre ++ s ++ Lib.gitItScriptSuf)
+                                [ "url?slice=11:34"
+                                , "https://example.com?slice=11"
+                                , "https://example.com"
+                                ]
+                            )
+            ]
+        , describe "convertGitItFile"
+            [ test "convert inline url & query" <|
+                \_ ->
+                    let
+                        msgs =
+                            [ Lib.Permalink "url" (Lib.LineRange 12 34)
+                            , Lib.Permalink "https://example.com" (Lib.LineRange 12 12)
+                            , Lib.Permalink "https://example.com" (Lib.LineRange 0 0)
+                            ]
+                    in
+                    List.map Lib.convertGitItFile msgs
+                        |> Expect.equal
+                            [ "url?slice=11:34"
+                            , "https://example.com?slice=11"
+                            , "https://example.com"
+                            ]
+            ]
+        , describe "parsePermalink"
             [ test "parse github permalink" <|
                 \_ ->
                     let
@@ -33,7 +70,11 @@ suite =
                             "$msg$"
                     in
                     Lib.genScript msg
-                        |> Expect.equal "<script src=\"https://gist-it.appspot.com/https://github.com/$msg$\"></script>"
+                        |> Expect.equal
+                            (Lib.gitItScriptPre
+                                ++ "$msg$"
+                                ++ Lib.gitItScriptSuf
+                            )
             ]
         , describe "parseLineRange"
             [ test "parse format L?-L? e.g. L12-L456 -> [12, 456]" <|

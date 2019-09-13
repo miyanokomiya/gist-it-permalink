@@ -13,9 +13,43 @@ type alias LineRange =
     }
 
 
+convertGitItScript : String -> String
+convertGitItScript msg =
+    parsePermalink msg
+        |> convertGitItFile
+        |> genScript
+
+
+convertGitItFile : Permalink -> String
+convertGitItFile msg =
+    if msg.lineRange.from == 0 then
+        msg.url
+
+    else
+        msg.url
+            ++ "?slice="
+            ++ String.fromInt (msg.lineRange.from - 1)
+            ++ (if msg.lineRange.from == msg.lineRange.to then
+                    ""
+
+                else
+                    ":" ++ String.fromInt msg.lineRange.to
+               )
+
+
+gitItScriptPre : String
+gitItScriptPre =
+    "<script src=\"https://gist-it.appspot.com/https://github.com/"
+
+
+gitItScriptSuf : String
+gitItScriptSuf =
+    "\"></script>"
+
+
 genScript : String -> String
 genScript msg =
-    "<script src=\"https://gist-it.appspot.com/https://github.com/" ++ msg ++ "\"></script>"
+    gitItScriptPre ++ msg ++ gitItScriptSuf
 
 
 parsePermalink : String -> Permalink
