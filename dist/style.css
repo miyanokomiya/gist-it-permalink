@@ -1,0 +1,30 @@
+html {
+  font-size: 1.2rem;
+}
+#app {
+  width: 100%;
+}
+input, textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid gray;
+  box-sizing: border-box;
+}
+textarea {
+  height: 6rem;
+  background-color: #eee;
+}
+.button-block {
+  text-align: right;
+}
+button {
+  width: 6rem;
+  padding: 0.2rem;
+}
+.link-block {
+  text-align: right;
+  margin-top: 1rem;
+}
+.link-block a {
+  margin-left: 0.5rem;
+}

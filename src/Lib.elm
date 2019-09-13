@@ -39,7 +39,7 @@ convertGitItFile msg =
 
 gitItScriptPre : String
 gitItScriptPre =
-    "<script src=\"https://gist-it.appspot.com/https://github.com/"
+    "<script src=\"https://gist-it.appspot.com/"
 
 
 gitItScriptSuf : String
