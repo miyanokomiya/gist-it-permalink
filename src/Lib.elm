@@ -3,7 +3,12 @@ module Lib exposing (..)
 
 type alias Permalink =
     { url : String
-    , from : Int
+    , lineRange : LineRange
+    }
+
+
+type alias LineRange =
+    { from : Int
     , to : Int
     }
 
@@ -13,44 +18,56 @@ genScript msg =
     "<script src=\"https://gist-it.appspot.com/https://github.com/" ++ msg ++ "\"></script>"
 
 
+parsePermalink : String -> Permalink
+parsePermalink msg =
+    let
+        splited =
+            String.split "#" msg
+    in
+    Permalink (getHeadString splited) (parseLineRange (getHeadString (List.reverse splited)))
 
--- parsePermalink : String -> Permalink
--- parsePermalink msg =
---   String.split "#" msg
---     |>
 
-
-parseLineRange : String -> List Int
+parseLineRange : String -> LineRange
 parseLineRange msg =
-    String.split "-" msg
-        |> List.map (\s -> String.dropLeft 1 s)
-        |> List.map String.toInt
-        |> List.map
-            (\i ->
-                case i of
-                    Nothing ->
-                        0
-
-                    Just int ->
-                        int
-            )
-        |> completeLineRange
-
-
-completeLineRange : List Int -> List Int
-completeLineRange range =
+    let
+        range =
+            String.split "-" msg
+                |> List.map (\s -> String.dropLeft 1 s)
+                |> List.map String.toInt
+                |> List.map getInt
+    in
     if List.length range == 1 then
-        [ getHead range, getHead range ]
+        LineRange (getHeadInt range) (getHeadInt range)
 
     else
-        range
+        LineRange (getHeadInt range) (getHeadInt (List.reverse range))
 
 
-getHead : List Int -> Int
-getHead msg =
+getInt : Maybe Int -> Int
+getInt msg =
+    case msg of
+        Nothing ->
+            0
+
+        Just int ->
+            int
+
+
+getHeadInt : List Int -> Int
+getHeadInt msg =
     case List.head msg of
         Nothing ->
             0
 
         Just int ->
             int
+
+
+getHeadString : List String -> String
+getHeadString msg =
+    case List.head msg of
+        Nothing ->
+            "![ERROR]"
+
+        Just str ->
+            str
