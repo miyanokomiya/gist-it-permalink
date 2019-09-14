@@ -13,23 +13,96 @@ suite =
                 \_ ->
                     let
                         msgs =
-                            [ "url#L12-L34"
-                            , "https://example.com#L12"
-                            , "https://example.com"
+                            [ { url = "url#L12-L34", footer = Lib.Default }
+                            , { url = "https://example.com#L12", footer = Lib.Default }
+                            , { url = "https://example.com", footer = Lib.Default }
+                            , { url = "url#L12-L34", footer = Lib.No }
+                            , { url = "url#L12", footer = Lib.No }
+                            , { url = "url", footer = Lib.No }
                             ]
-
-                        footerType =
-                            Lib.Default
                     in
-                    List.map (\m -> Lib.convertGitItScript m footerType) msgs
+                    List.map (\m -> Lib.convertGitItScript m.url m.footer) msgs
                         |> Expect.equal
                             (List.map
                                 (\s -> Lib.gitItScriptPre ++ s ++ Lib.gitItScriptSuf)
                                 [ "url?slice=11:34"
                                 , "https://example.com?slice=11"
                                 , "https://example.com"
+                                , "url?slice=11:34&footer=no"
+                                , "url?slice=11&footer=no"
+                                , "url?footer=no"
                                 ]
                             )
+            ]
+        , describe "footerTypeToString"
+            [ test "footer type to string" <|
+                \_ ->
+                    let
+                        msgs =
+                            [ Lib.Default
+                            , Lib.Minimal
+                            , Lib.No
+                            ]
+                    in
+                    List.map Lib.footerTypeToString msgs
+                        |> Expect.equal
+                            [ "Default"
+                            , "Minimal"
+                            , "No"
+                            ]
+            ]
+        , describe "footerTypeFromString"
+            [ test "create footer type from string" <|
+                \_ ->
+                    let
+                        msgs =
+                            [ "Default"
+                            , "Minimal"
+                            , "No"
+                            , "Unknown"
+                            ]
+                    in
+                    List.map Lib.footerTypeFromString msgs
+                        |> Expect.equal
+                            [ Lib.Default
+                            , Lib.Minimal
+                            , Lib.No
+                            , Lib.Default
+                            ]
+            ]
+        , describe "toFooterQuery"
+            [ test "footer type to query" <|
+                \_ ->
+                    let
+                        msgs =
+                            [ Lib.Default
+                            , Lib.Minimal
+                            , Lib.No
+                            ]
+                    in
+                    List.map Lib.toFooterQuery msgs
+                        |> Expect.equal
+                            [ ""
+                            , "footer=minimal"
+                            , "footer=no"
+                            ]
+            ]
+        , describe "toLineRangeQuery"
+            [ test "line lange to query" <|
+                \_ ->
+                    let
+                        msgs =
+                            [ Lib.LineRange 12 34
+                            , Lib.LineRange 12 12
+                            , Lib.LineRange 0 0
+                            ]
+                    in
+                    List.map Lib.toLineRangeQuery msgs
+                        |> Expect.equal
+                            [ "slice=11:34"
+                            , "slice=11"
+                            , ""
+                            ]
             ]
         , describe "convertGitItFile"
             [ test "convert inline url & query" <|

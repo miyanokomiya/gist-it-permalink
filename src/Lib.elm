@@ -34,14 +34,14 @@ footerTypeToString ft =
 
 footerTypeFromString : String -> FooterType
 footerTypeFromString str =
-    if str == footerTypeToString Default then
-        Default
-
-    else if str == footerTypeToString Minimal then
+    if str == footerTypeToString Minimal then
         Minimal
 
-    else
+    else if str == footerTypeToString No then
         No
+
+    else
+        Default
 
 
 convertGitItScript : String -> FooterType -> String
