@@ -1,8 +1,8 @@
-module TestLib exposing (..)
+module TestLib exposing (suite)
 
 import Expect
 import Lib
-import Test exposing (..)
+import Test exposing (Test, describe, test)
 
 
 suite : Test
